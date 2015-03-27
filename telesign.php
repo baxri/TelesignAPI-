@@ -1,6 +1,5 @@
 <?php
 
-
 class TeleSign{
 
 	private $api_key_base_64 = 'yvPPGgvPbYfBI65juyXVkNoI0lSFa82K4YxzgbTOoYl4UXPn/WFY6KZzPBTjAtGk7TwEfPUgoXGlHv7xVUh31Q==';
@@ -10,10 +9,14 @@ class TeleSign{
 
 	public function sendSMS( $code = '' ){
 
+		$date = date_create(gmdate('D, d M Y H:i:s T', time()), timezone_open('Etc/GMT+0'));	
 		$curl = curl_init($this->rest_url);
 
-		$date = str_replace('GMT', '+0000 ', gmdate('D, d M Y H:i:s T', time())) ;
-		
+		date_timezone_set($date, timezone_open('Etc/GMT-4'));
+		$date = date_format($date, 'D, d M Y H:i:s +0400 ');
+
+		echo $date;
+
 		$curl_post_data = array(       
 			"phone_number" => '995598602084',
 			"language" => 'en-US',
@@ -31,10 +34,10 @@ class TeleSign{
 	    //curl_setopt($curl, CURLOPT_HEADER, 1);
 		//curl_setopt($curl, CURLINFO_HEADER_OUT, true);
 		curl_setopt( $curl, CURLOPT_POST, true);
-		curl_setopt( $curl,  CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt( $curl,  CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+		curl_setopt($curl,  CURLOPT_POSTFIELDS, $curl_post_data);
 
 		$curl_response = curl_exec($curl);
 		$info = curl_getinfo($curl);
@@ -82,20 +85,20 @@ class TeleSign{
 		echo 'UTF8 Encoded StringToSign'."\n";		
 		print_r($StringToSign);
 		echo "\n".'--------------------------------------'."\n\n\n";
-		echo 'Base 65 decoded api key'."\n";
+		echo 'Base 64 decoded api key'."\n";
 		$key = base64_decode($this->api_key_base_64);
 		echo $key;
 
-		echo "\n".'--------------------------------------'."\n\n\n";
-		echo 'Base 65 decoded api key With UTF-8 Encoded WICH I AM USING'."\n";
-		$key = utf8_encode($key);
-		echo $key;
+		//echo "\n".'--------------------------------------'."\n\n\n";
+		//echo 'Base 65 decoded api key With UTF-8 Encoded WICH I AM USING'."\n";
+		//$key = utf8_encode($key);
+		//echo $key;
 
 		echo "\n".'--------------------------------------'."\n\n\n";
 		echo 'Signature With hash_hmac(sha1, StringToSign, api_key )'."\n";
 
 		//Hashing the Signature with sha1 algorithm 
-		$signature = hash_hmac('sha1', $StringToSign, $key );
+		$signature = hash_hmac('sha1', $StringToSign, $key, true );
 
 		echo '<pre>';
 		print_r($signature);
@@ -103,7 +106,7 @@ class TeleSign{
 		echo "\n".'--------------------------------------'."\n\n\n";
 		echo 'Signature Base 64 encoded'."\n";
 		//Base 65 Encoding
-		$signature .= base64_encode($signature);
+		$signature = base64_encode($signature);
 		echo $signature;
 
 		echo "\n".'--------------------------------------'."\n\n\n";
