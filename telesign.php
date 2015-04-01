@@ -106,7 +106,7 @@ class TeleSign{
 		echo "\n".'--------------------------------------'."\n\n\n";
 		echo 'Signature Base 64 encoded'."\n";
 		//Base 65 Encoding
-		$signature = base64_encode($signature);
+		$signature .= base64_encode($signature);
 		echo $signature;
 
 		echo "\n".'--------------------------------------'."\n\n\n";
